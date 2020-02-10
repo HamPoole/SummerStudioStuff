@@ -119,6 +119,8 @@ class PhotoCtrl(wx.App):
 
         crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
 
+
+
         print('shape:', img.shape)
 
         W = crop_img.shape[1]
@@ -175,6 +177,8 @@ class PhotoCtrl(wx.App):
 
         filepath = self.photoTxt.GetValue()
         img = wx.Image(filepath, wx.BITMAP_TYPE_ANY)
+
+        img = cv2.rectangle(img, (2423,3), (2458,1216), (0,200,0), 1)
         # scale the image, preserving the aspect ratio
         W = img.GetWidth()
         H = img.GetHeight()
