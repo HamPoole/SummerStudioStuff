@@ -178,7 +178,9 @@ class PhotoCtrl(wx.App):
         filepath = self.photoTxt.GetValue()
         img = wx.Image(filepath, wx.BITMAP_TYPE_ANY)
 
-        img = cv2.rectangle(img, (2423,3), (2458,1216), (0,200,0), 1)
+        print('img.shapey', img.shape)
+        #cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
+        #cv2.rectangle(img, (2423,3), (2458,1216), (0,200,0), 2)
         # scale the image, preserving the aspect ratio
         W = img.GetWidth()
         H = img.GetHeight()
