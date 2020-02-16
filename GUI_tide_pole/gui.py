@@ -1,16 +1,64 @@
-import os
-import wx
+import numpy as np
+import functools
+import time
+import logging
+import sys
 
+import serial.tools.list_ports
+import wx
+import wx.lib.agw.aui as aui
+import wx.lib.agw.floatspin as floatspin
+import wx.lib.plot
 import time
 import cv2
 
 
+EVT_HARDWARE_ID = wx.Window.NewControlId()
 
-class PhotoCtrl(wx.App):
+class FrameMain(wx.Frame):
+
+    def __init__(self, radio_selection):
+        wx.Frame.__init__(self, None,
+                          title='Radio Alignment Tool',
+                          style=(wx.MINIMIZE_BOX
+                                 | wx.MAXIMIZE_BOX
+                                 | wx.SYSTEM_MENU
+                                 | wx.CAPTION
+                                 | wx.CLOSE_BOX
+                                 | wx.CLIP_CHILDREN),
+                          size=(800, 600))
+
+        self.frame_photo = PhotoCtrl(self)
+
+
+        self.sizer.Add(self.nb, 1, wx.EXPAND | wx.ALL, 2)
+        self.SetSizer(self.sizer)
+        self.Bind(aui.EVT_AUINOTEBOOK_PAGE_CHANGED, self.on_page_changed)
+        self.Bind(wx.EVT_CLOSE, self.on_close)
+        self.Bind(wx.EVT_TIMER, self.on_timer)
+
+        self.prev_page_title = self.current_page_title()
+        self.frame_connection.display_connection_status()
+        self.Connect(-1, -1, EVT_HARDWARE_ID, self.on_radio_response)
+        self.Layout()
+        self.Centre(wx.BOTH)
+
+
+class PhotoCtrl(wx.Frame):
 
     def __init__(self, redirect=False, filename=None):
-        wx.App.__init__(self, redirect, filename)
-        self.frame = wx.Frame(None, title='Auto Tidepole Reader')
+        #wx.App.__init__(self, redirect, filename)
+
+        self.frame = wx.Frame(self, None,
+                          title='Radio Alignment Tool',
+                          style=(wx.MINIMIZE_BOX
+                                 | wx.MAXIMIZE_BOX
+                                 | wx.SYSTEM_MENU
+                                 | wx.CAPTION
+                                 | wx.CLOSE_BOX
+                                 | wx.CLIP_CHILDREN),
+                         size=(800, 600))
+
 
         self.panel = wx.Panel(self.frame)
         self.PhotoMaxSize = 800
@@ -43,13 +91,13 @@ class PhotoCtrl(wx.App):
 
     def createWidgets(self):
         instructions = 'Select Tidepole Directory'
-        img = wx.Image(800, 600)
+        img = wx.Image(600, 400)
         self.imageCtrl = wx.StaticBitmap(self.panel, wx.ID_ANY,
                                          wx.Bitmap(img))
 
 #-----
         x1 = 20
-        self.p0txt1 = wx.StaticText(self.panel, wx.ID_ANY, 'Serial ports:', (x1, 20))
+        self.p0txt1 = wx.StaticText(self.panel, wx.ID_ANY, 'Serial ports:', (x1, 1000))
 #----
 
 
@@ -280,5 +328,7 @@ class PhotoCtrl(wx.App):
 
 
 if __name__ == '__main__':
-    app = PhotoCtrl()
+    app = wx.App(redirect=False)
+    frame = PhotoCtrl()
+    frame.Show(True)
     app.MainLoop()
